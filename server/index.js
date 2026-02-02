@@ -28,8 +28,6 @@ app.use(
   })
 );
 
-app.options("*", cors());
-
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
@@ -42,6 +40,7 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`server running on port ${PORT}`);
 });
+
 
 
 
