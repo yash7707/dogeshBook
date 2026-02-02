@@ -53,7 +53,3 @@ dogeshBook/
 ├── client/ # React frontend
 └── server/ # Node.js backend
 
-
-
-## 📁 Project Structure
-
