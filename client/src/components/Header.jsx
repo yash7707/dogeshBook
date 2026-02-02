@@ -301,7 +301,7 @@ const Header = () => {
           </>
         ) : (
           <>
-            <Link
+            {/* <Link
               ref={loginLinkRef}
               to="/login"
               style={{
@@ -342,7 +342,7 @@ const Header = () => {
               onMouseLeave={(e) => animateHover(e.target, false, "coral")}
             >
               Register
-            </Link>
+            </Link> */}
           </>
         )}
       </nav>

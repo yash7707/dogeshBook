@@ -19,13 +19,28 @@ const app = express();
 // connect DB
 connectDB();
 
+const allowedOrigins = [
+  "http://localhost:5173", // local frontend
+  "http://localhost:3000", // optional
+  "https://peaceful-bombolone-a823c5.netlify.app", // production frontend
+];
+
 // middleware
 app.use(
   cors({
-    origin: "https://peaceful-bombolone-a823c5.netlify.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-  })
+    origin: function (origin, callback) {
+      // allow server-to-server tools (Postman, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
 );
 
 app.use(express.json());
@@ -40,7 +55,3 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`server running on port ${PORT}`);
 });
-
-
-
-
