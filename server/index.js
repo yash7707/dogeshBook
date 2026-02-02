@@ -20,7 +20,15 @@ const app = express();
 connectDB();
 
 // middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://peaceful-bombolone-a823c5.netlify.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
+
+app.options("*", cors());
 
 app.use(express.json());
 app.use("/api/auth", authRoutes);
@@ -34,5 +42,6 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`server running on port ${PORT}`);
 });
+
 
 
