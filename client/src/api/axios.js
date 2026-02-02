@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://dogeshbook.onrender.com//api",
+  baseURL: "https://dogeshbook.onrender.com/api",
 });
 
 // Attach token automatically
@@ -14,5 +14,6 @@ api.interceptors.request.use((req) => {
 });
 
 export default api;
+
 
 
