@@ -19,7 +19,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173", // local frontend
   "http://localhost:3000", // optional
-  "https:/dogesh-book.netlify.app", // production frontend
+  "https://dogesh-book.netlify.app", // production frontend
 ];
 
 // connect DB
