@@ -1,5 +1,6 @@
+import "./config/bootstrap.js"
+
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 
 import "./models/Dog.js";
@@ -7,23 +8,23 @@ import "./models/User.js";
 import "./models/Post.js";
 
 import connectDB from "./config/db.js";
+import "./config/cloudinary.js";
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import dogRoutes from "./routes/dogRoutes.js";
 
-dotenv.config();
-
 const PORT = process.env.PORT || 5000; // port
 const app = express();
-
-// connect DB
-connectDB();
 
 const allowedOrigins = [
   "http://localhost:5173", // local frontend
   "http://localhost:3000", // optional
   "https://peaceful-bombolone-a823c5.netlify.app", // production frontend
 ];
+
+// connect DB
+connectDB();
+
 
 // middleware
 app.use(

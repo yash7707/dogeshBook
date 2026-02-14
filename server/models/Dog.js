@@ -21,6 +21,9 @@ const dogSchema = new mongoose.Schema(
     avatar: {
       type: String,
     },
+    avatarPublicId:{
+      type: String,
+    },
 
     owner: {
       type: mongoose.Schema.Types.ObjectId,

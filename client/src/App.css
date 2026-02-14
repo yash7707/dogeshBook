@@ -1,91 +1,115 @@
-/* theme.css - ADD THIS FILE TO YOUR PROJECT */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
 :root {
-  /* Color Palette */
-   --primary-blue: #6699cc;
-  --primary-blue-dark: #3A5A8A;
-  --secondary-coral: #FF8A7A;
-  --secondary-coral-dark: #E87A6A;
-  --accent-yellow: #FFD166;
-  --paw-pink: #FFB7C5;
-  --text-dark: #2D3748;
-  --card-white: #FFFFFF;
-  --border-light: #E2E8F0;
-  --black-bg:#000;
+  /* Editorial Palette */
+  --bg-color: #f0f0f0;         /* Soft studio grey */
+  --card-bg: #ffffff;
+  --text-main: #121212;        /* Deep charcoal, not pure black */
+  --accent-color: #000000;
+  --hollow-color: #121212;
   
-  /* Neutrals */
-  --bg-white: #F9F7F7;
-  --card-white: #FFFFFF;
-  --text-dark: #2D3748;
-  --text-medium: #718096;
-  --text-light: #A0AEC0;
-  --text-white:#fff;
-  --border-light: #E2E8F0;
-  --border-medium: #CBD5E0;
+  /* Modern Spacing */
+  --container-pad: 4vw;
+  --radius-xl: 32px;
   
-  /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  
-  /* Border Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-circle: 50%;
-  
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.16);
-  
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
-  --transition-slow: 350ms ease;
+  /* Shadows & Glass */
+  --soft-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  --border-stroke: 1.5px solid #121212;
 }
 
-/* Base styles */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: var(--bg-white);
-  color: var(--text-dark);
   margin: 0;
   padding: 0;
-}
-.hide{
-  display: none !important; 
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-color);
+  background-image: url("https://www.transparenttextures.com/patterns/felt.png"); /* Subtle texture to make it look "pro" */
+  color: var(--text-main);
+  overflow-x: hidden;
 }
 
-/* Navigation specific styles */
+/* --- THE SIGNATURE LOOK: HOLLOW & BOLD --- */
+
+.hollow-text {
+  font-weight: 900;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--hollow-color);
+  font-size: clamp(3rem, 10vw, 8rem);
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  margin: 0;
+}
+
+.bold-heading {
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+/* --- NAVIGATION REINVENTED --- */
+
+.nav-container {
+  padding: var(--space-md) var(--container-pad);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(240, 240, 240, 0.8);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
 .nav-link {
   text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 8px 16px;
-  border-radius: var(--radius-md);
-  transition: all var(--transition-base);
+  color: var(--text-main);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
 }
 
 .nav-link:hover {
-  background-color: rgba(74, 111, 165, 0.1);
+  letter-spacing: 0.2em; /* Subtle modern animation */
+  opacity: 0.6;
 }
 
 .logout-btn {
-  background: none;
-  border: 2px solid var(--secondary-coral);
-  color: var(--secondary-coral);
-  padding: 8px 16px;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 14px;
+  background: var(--text-main);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 0; /* Sharp edges for a "bold" look */
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: transform 0.2s ease;
 }
 
 .logout-btn:hover {
-  background-color: var(--secondary-coral);
-  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* --- GENERIC IMAGE TREATMENT --- */
+
+.dog-image-container {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: #ddd;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dog-image-container:hover {
+  transform: scale(1.02);
+}
+
+.dog-image-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: grayscale(20%); /* Modern muted look */
 }

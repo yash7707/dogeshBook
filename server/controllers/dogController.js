@@ -1,4 +1,8 @@
 import Dog from "../models/Dog.js";
+import cloudinary from "../config/cloudinary.js";
+import streamifier from "streamifier";
+
+
 
 // @desc Create dog profile
 // @route POST /api/dogs
@@ -62,7 +66,51 @@ export const updateDog = async (req, res) => {
     dog.name = req.body.name || dog.name;
     dog.breed = req.body.breed || dog.breed;
     dog.age = req.body.age || dog.age;
-    dog.avatar = req.body.avatar || dog.avatar;
+    // dog.avatar = req.body.avatar || dog.avatar;
+    // console.log(Object.fromEntries(req.body.avatar.entries()), req.file);
+
+    if(req.body.avatar === ""){
+      // delete old image if exists
+      if (dog.avatarPublicId) {
+        await cloudinary.uploader.destroy(dog.avatarPublicId);
+      }
+
+      dog.avatar = "";
+      dog.avatarPublicId = "";
+    }
+
+       // if avatar image is uploaded
+    if (req.file) {
+
+       if (!process.env.CLOUDINARY_API_KEY) {
+        throw new Error("Cloudinary env vars missing");
+      }
+
+      // delete old image if exists
+      if (dog.avatarPublicId) {
+        await cloudinary.uploader.destroy(dog.avatarPublicId);
+      }
+
+      // upload new image using buffer
+      const uploadFromBuffer = () =>
+        new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "dogeshbook/avatars" },
+            (error, result) => {
+              if (result) resolve(result);
+              else {
+                return reject(error)};
+            }
+          );
+
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+
+      const result = await uploadFromBuffer();
+
+      dog.avatar = result.secure_url;
+      dog.avatarPublicId = result.public_id;
+    }
 
     const updatedDog = await dog.save();
     res.json(updatedDog);
@@ -70,3 +118,5 @@ export const updateDog = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
