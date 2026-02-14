@@ -1,9 +1,12 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAvatarColor, getAvatarLetter } from "../utils/GetAvatarPlaceholder";
+import {
+  getAvatarColor,
+  getAvatarLetter,
+} from "../utils/getAvatarPlaceholder.js";
 import api from "../api/axios";
 import useAuth from "../context/useAuth";
-import "../style/DogProfile.css"
+import "../style/DogProfile.css";
 import ImageUpload from "../components/ImageUpload";
 
 const DogProfile = () => {
@@ -55,12 +58,12 @@ const DogProfile = () => {
     e.preventDefault();
     setError("");
 
-    // multipart data 
+    // multipart data
     const formData = new FormData();
-    formData.append("name" , name);
-    formData.append("breed" , breed);
-    formData.append("age" , age);
-    formData.append("avatar" , img);
+    formData.append("name", name);
+    formData.append("breed", breed);
+    formData.append("age", age);
+    formData.append("avatar", img);
 
     try {
       if (dog) {
@@ -83,7 +86,7 @@ const DogProfile = () => {
   const handleAvatarClick = (e) => {
     seteditAvatar(true);
     setShowImageUpload(false);
-  }
+  };
 
   const handleCloseModal = () => {
     seteditAvatar(false);
@@ -129,20 +132,25 @@ const DogProfile = () => {
 
   if (loading) {
     return (
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "60vh",
-        gap: "20px"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "60vh",
+          gap: "20px",
+        }}
+      >
         <div style={{ display: "flex", gap: "15px" }}>
           {["🐕", "🐩", "🐕‍🦺"].map((dogEmoji, i) => (
-            <span key={i} style={{
-              fontSize: "40px",
-              animation: `bounce 1s infinite ${i * 0.2}s`
-            }}>
+            <span
+              key={i}
+              style={{
+                fontSize: "40px",
+                animation: `bounce 1s infinite ${i * 0.2}s`,
+              }}
+            >
               {dogEmoji}
             </span>
           ))}
@@ -161,82 +169,116 @@ const DogProfile = () => {
   }
 
   return (
-    <div style={{
-      maxWidth: "600px",
-      margin: "0 auto 40px",
-      padding: "30px 20px"
-    }} >
+    <div
+      style={{
+        maxWidth: "600px",
+        margin: "0 auto 40px",
+        padding: "30px 20px",
+      }}
+    >
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: "30px" }}>
-        <h1 style={{
-          color: "var(--primary-blue, #4A6FA5)",
-          fontSize: "2rem",
-          marginBottom: "10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "12px"
-        }}>
+        <h1
+          style={{
+            color: "var(--primary-blue, #4A6FA5)",
+            fontSize: "2rem",
+            marginBottom: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "12px",
+          }}
+        >
           <span style={{ animation: "float 3s infinite" }}>🐶</span>
           {dog ? "Update Dog Profile" : "Create Dog Profile"}
         </h1>
         <p style={{ color: "var(--text-medium, #718096)" }}>
-          {dog ? "Update your furry friend's information" : "Let's create a profile for your dog!"}
+          {dog
+            ? "Update your furry friend's information"
+            : "Let's create a profile for your dog!"}
         </p>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div style={{
-          backgroundColor: "rgba(255, 138, 122, 0.1)",
-          border: "1px solid var(--secondary-coral, #FF8A7A)",
-          color: "var(--secondary-coral-dark, #E87A6A)",
-          padding: "12px 16px",
-          borderRadius: "12px",
-          marginBottom: "20px",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px"
-        }}>
+        <div
+          style={{
+            backgroundColor: "rgba(255, 138, 122, 0.1)",
+            border: "1px solid var(--secondary-coral, #FF8A7A)",
+            color: "var(--secondary-coral-dark, #E87A6A)",
+            padding: "12px 16px",
+            borderRadius: "12px",
+            marginBottom: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
           <span>⚠️</span>
           {error}
         </div>
       )}
 
       {/* Form Card */}
-      <div style={{
-        backgroundColor: "white",
-        borderRadius: "16px",
-        padding: "30px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-        border: "1px solid var(--border-light, #E2E8F0)"
-      }}>
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-
+      <div
+        style={{
+          backgroundColor: "white",
+          borderRadius: "16px",
+          padding: "30px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+          border: "1px solid var(--border-light, #E2E8F0)",
+        }}
+      >
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+        >
           {/* Avatar */}
-          <div id="avtarDiv" style={{textAlign:"center",display:"flex", justifyContent:"center", cursor:"pointer"}} onClick={handleAvatarClick}>
-            {avatar ?  <img className="avtar-img" src={avatar} alt="avatar-image" width={"100px"} height={"100px"} style={{objectFit:"cover", borderRadius:"var(--radius-circle, 50%)"}}/> :  <div
-          className="dog-avatar"
-          style={{
-              backgroundColor: getAvatarColor(name),
+          <div
+            id="avtarDiv"
+            style={{
+              textAlign: "center",
+              display: "flex",
+              justifyContent: "center",
+              cursor: "pointer",
             }}
+            onClick={handleAvatarClick}
           >
-            {getAvatarLetter(name)}
-          </div>}
-           
-
+            {avatar ? (
+              <img
+                className="avtar-img"
+                src={avatar}
+                alt="avatar-image"
+                width={"100px"}
+                height={"100px"}
+                style={{
+                  objectFit: "cover",
+                  borderRadius: "var(--radius-circle, 50%)",
+                }}
+              />
+            ) : (
+              <div
+                className="dog-avatar"
+                style={{
+                  backgroundColor: getAvatarColor(name),
+                }}
+              >
+                {getAvatarLetter(name)}
+              </div>
+            )}
           </div>
-          
+
           {/* Name Field */}
           <div>
-            <label style={{
-              marginBottom: "8px",
-              fontWeight: "600",
-              color: "var(--text-dark, #2D3748)",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
+            <label
+              style={{
+                marginBottom: "8px",
+                fontWeight: "600",
+                color: "var(--text-dark, #2D3748)",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
             >
               <span>🐕</span>
               Dog Name *
@@ -254,21 +296,23 @@ const DogProfile = () => {
                 border: "2px solid var(--border-light, #E2E8F0)",
                 borderRadius: "12px",
                 fontSize: "16px",
-                transition: "all 0.3s ease"
+                transition: "all 0.3s ease",
               }}
             />
           </div>
 
           {/* Breed Field */}
           <div>
-            <label style={{
-              marginBottom: "8px",
-              fontWeight: "600",
-              color: "var(--text-dark, #2D3748)",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px"
-            }}>
+            <label
+              style={{
+                marginBottom: "8px",
+                fontWeight: "600",
+                color: "var(--text-dark, #2D3748)",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
               <span>🏷️</span>
               Breed
             </label>
@@ -284,21 +328,23 @@ const DogProfile = () => {
                 border: "2px solid var(--border-light, #E2E8F0)",
                 borderRadius: "12px",
                 fontSize: "16px",
-                transition: "all 0.3s ease"
+                transition: "all 0.3s ease",
               }}
             />
           </div>
 
           {/* Age Field */}
           <div>
-            <label style={{
-              marginBottom: "8px",
-              fontWeight: "600",
-              color: "var(--text-dark, #2D3748)",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px"
-            }}>
+            <label
+              style={{
+                marginBottom: "8px",
+                fontWeight: "600",
+                color: "var(--text-dark, #2D3748)",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
               <span>🎂</span>
               Age
             </label>
@@ -314,7 +360,7 @@ const DogProfile = () => {
                 border: "2px solid var(--border-light, #E2E8F0)",
                 borderRadius: "12px",
                 fontSize: "16px",
-                transition: "all 0.3s ease"
+                transition: "all 0.3s ease",
               }}
             />
           </div>
@@ -339,11 +385,13 @@ const DogProfile = () => {
           </div> */}
 
           {/* Submit Button */}
-          <button 
+          <button
             type="submit"
             disabled={isSubmitting || !name.trim()}
             style={{
-              backgroundColor: isSubmitting ? "var(--border-light, #E2E8F0)" : "var(--primary-blue, #4A6FA5)",
+              backgroundColor: isSubmitting
+                ? "var(--border-light, #E2E8F0)"
+                : "var(--primary-blue, #4A6FA5)",
               color: "white",
               border: "none",
               padding: "16px 24px",
@@ -355,25 +403,25 @@ const DogProfile = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "8px"
+              gap: "8px",
             }}
           >
             {isSubmitting ? (
               <>
-                <span style={{
-                  width: "16px",
-                  height: "16px",
-                  border: "2px solid rgba(255, 255, 255, 0.3)",
-                  borderRadius: "50%",
-                  borderTopColor: "white",
-                  animation: "spin 1s linear infinite"
-                }}></span>
+                <span
+                  style={{
+                    width: "16px",
+                    height: "16px",
+                    border: "2px solid rgba(255, 255, 255, 0.3)",
+                    borderRadius: "50%",
+                    borderTopColor: "white",
+                    animation: "spin 1s linear infinite",
+                  }}
+                ></span>
                 Processing...
               </>
             ) : (
-              <>
-                {dog ? "Update Profile" : "Create Profile"}
-              </>
+              <>{dog ? "Update Profile" : "Create Profile"}</>
             )}
           </button>
         </form>
@@ -381,7 +429,14 @@ const DogProfile = () => {
 
       {/* Avatar Modal */}
       <div id="avatar-modal" className={editAvatar ? "" : "hide"}>
-        <div className="modal-inner" style={{ position: "relative", padding: "24px 16px 16px 16px", zIndex: 2000 }}>
+        <div
+          className="modal-inner"
+          style={{
+            position: "relative",
+            padding: "24px 16px 16px 16px",
+            zIndex: 2000,
+          }}
+        >
           {/* Close Button */}
           <button
             onClick={handleCloseModal}
@@ -394,7 +449,7 @@ const DogProfile = () => {
               fontSize: "1.5rem",
               cursor: "pointer",
               color: "#4A6FA5",
-              zIndex: 2
+              zIndex: 2,
             }}
             aria-label="Close"
           >
@@ -407,10 +462,7 @@ const DogProfile = () => {
                 <ImageUpload onReady={handleNewData} />
               </div>
               <div className="modal-action-btns">
-                <button
-                  onClick={() => setShowImageUpload(false)}
-                  type="button"
-                >
+                <button onClick={() => setShowImageUpload(false)} type="button">
                   Cancel
                 </button>
               </div>
@@ -418,7 +470,12 @@ const DogProfile = () => {
           ) : (
             <>
               {avatar ? (
-                <img className="avtar-img-scaled" src={avatar} alt="avatar-image" width={"100px"} />
+                <img
+                  className="avtar-img-scaled"
+                  src={avatar}
+                  alt="avatar-image"
+                  width={"100px"}
+                />
               ) : (
                 <div
                   className="dog-avatar-scaled"
@@ -429,10 +486,7 @@ const DogProfile = () => {
               )}
               {/* Action Buttons */}
               <div className="modal-action-btns">
-                <button
-                  onClick={handleEditAvatar}
-                  type="button"
-                >
+                <button onClick={handleEditAvatar} type="button">
                   Edit
                 </button>
                 <button
