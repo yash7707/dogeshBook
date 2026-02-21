@@ -7,7 +7,7 @@ This project demonstrates real-world full-stack development concepts including a
 
 ## 🚀 Live Demo
 
-- **Frontend:** (https://dogesh-book.netlify.app/)
+- **Frontend:** https://dogesh-book.netlify.app/
   
 ---
 
