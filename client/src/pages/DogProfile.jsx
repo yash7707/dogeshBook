@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAvatarColor, getAvatarLetter } from "../utils/GetAvatarPlaceholder";
+import { getAvatarColor, getAvatarLetter } from "../utils/getAvatarPlaceholder";
 import api from "../api/axios";
 import useAuth from "../context/useAuth";
 import "../style/DogProfile.css";
