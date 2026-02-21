@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  getAvatarColor,
-  getAvatarLetter,
-} from "../utils/getAvatarPlaceholder.js";
-import "../style/PostCard.css";
+import { getAvatarColor, getAvatarLetter } from "../utils/GetAvatarPlaceholder";
+import "../style/PostCard.css"; 
 
 const PostCard = ({ post, onLike }) => {
   const [isLiked, setIsLiked] = useState(false);
@@ -54,6 +51,7 @@ const PostCard = ({ post, onLike }) => {
       return date.toLocaleDateString();
     }
   };
+
 
   return (
     <div className="post-card">

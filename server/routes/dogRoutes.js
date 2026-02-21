@@ -9,7 +9,7 @@ import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", protect, createDog);
+router.post("/", protect, upload.single("avatar"), createDog);
 router.get("/me", protect, getMyDog);
 // router.put("/me", protect, updateDog);
 router.put(

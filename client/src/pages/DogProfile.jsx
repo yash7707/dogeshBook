@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getAvatarColor,
-  getAvatarLetter,
-} from "../utils/getAvatarPlaceholder.js";
+import { getAvatarColor, getAvatarLetter } from "../utils/GetAvatarPlaceholder";
 import api from "../api/axios";
 import useAuth from "../context/useAuth";
 import "../style/DogProfile.css";
@@ -57,6 +54,7 @@ const DogProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
 
     // multipart data
     const formData = new FormData();
@@ -77,13 +75,14 @@ const DogProfile = () => {
       }
 
       // After dog exists, go to feed
+      setIsSubmitting(false);
       navigate("/feed");
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
     }
   };
 
-  const handleAvatarClick = (e) => {
+  const handleAvatarClick = () => {
     seteditAvatar(true);
     setShowImageUpload(false);
   };
@@ -189,7 +188,6 @@ const DogProfile = () => {
             gap: "12px",
           }}
         >
-          <span style={{ animation: "float 3s infinite" }}>🐶</span>
           {dog ? "Update Dog Profile" : "Create Dog Profile"}
         </h1>
         <p style={{ color: "var(--text-medium, #718096)" }}>
@@ -444,16 +442,19 @@ const DogProfile = () => {
               position: "absolute",
               top: 0,
               right: 0,
-              background: "transparent",
               border: "none",
-              fontSize: "1.5rem",
+              fontSize: "1rem",
               cursor: "pointer",
-              color: "#4A6FA5",
+              color: "#fff",
               zIndex: 2,
+              fontWeight: 700,
+              borderRadius: "0 0 0 15px",
+              padding: "10px 12px",
+              background: "rgb(74 111 165 / 71%)",
             }}
             aria-label="Close"
           >
-            ×
+            ✕
           </button>
           {/* Avatar Preview or ImageUpload */}
           {showImageUpload ? (

@@ -78,7 +78,7 @@ const Footer = () => {
           <span className="heart-beat">💖</span>
         </div>
 
-        <div className="footer-links hide">
+        <div className="footer-links">
           <button
             className="footer-link"
             onClick={() => {
@@ -87,7 +87,7 @@ const Footer = () => {
               setTimeout(() => setBouncingPaw(false), 300);
             }}
           >
-            🐶 Breed Guide
+            Breed Guide
           </button>
           <span className="divider">•</span>
           <button
@@ -101,18 +101,7 @@ const Footer = () => {
               setTimeout(() => setBouncingPaw(false), 300);
             }}
           >
-            🏡 Adopt Don't Shop
-          </button>
-          <span className="divider">•</span>
-          <button
-            className="footer-link"
-            onClick={() => {
-              window.open("mailto:woof@dogeshbook.com");
-              setBouncingPaw(true);
-              setTimeout(() => setBouncingPaw(false), 300);
-            }}
-          >
-            📧 Woof at Us
+            Adopt Don't Shop
           </button>
         </div>
 

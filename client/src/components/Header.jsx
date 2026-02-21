@@ -53,17 +53,17 @@ const Header = () => {
         });
       } else {
         // For logged out user
-        const navItems = [loginLinkRef.current, registerLinkRef.current].filter(
-          Boolean,
-        );
-        gsap.from(navItems, {
-          x: 30,
-          opacity: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          delay: 0.4,
-          ease: "power2.out",
-        });
+        // const navItems = [loginLinkRef.current, registerLinkRef.current].filter(
+        //   Boolean,
+        // );
+        // gsap.from(navItems, {
+        //   x: 30,
+        //   opacity: 0,
+        //   duration: 0.6,
+        //   stagger: 0.1,
+        //   delay: 0.4,
+        //   ease: "power2.out",
+        // });
       }
     });
 

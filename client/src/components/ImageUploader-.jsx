@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef } from "react";
 
 const ImageUpload = ({
   onImageChange,
@@ -12,15 +12,6 @@ const ImageUpload = ({
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
-
-  // Generate form data with the uploaded image
-  const getFormData = useCallback(() => {
-    const formData = new FormData();
-    if (img) {
-      formData.append(name, img);
-    }
-    return formData;
-  }, [img, name]);
 
   // Validate file
   const validateFile = (file) => {

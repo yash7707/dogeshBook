@@ -191,7 +191,7 @@ const ImageUpload = ({
               </button>
               <button
                 type="button"
-                className="remove-button"
+                className="remove-button hide"
                 onClick={handleClear}
               >
                 Remove

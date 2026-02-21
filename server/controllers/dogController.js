@@ -9,7 +9,9 @@ import streamifier from "streamifier";
 // @access Protected
 export const createDog = async (req, res) => {
   try {
-    const { name, breed, age, avatar } = req.body;
+    const { name, breed, age } = req.body;
+    let avatar = "";
+    let avatarPublicId = "";
 
     if (!name) {
       return res.status(400).json({ message: "Dog name is required" });
@@ -21,11 +23,40 @@ export const createDog = async (req, res) => {
       return res.status(400).json({ message: "Dog profile already exists" });
     }
 
+       // if avatar image is uploaded
+    if (req.file) {
+
+       if (!process.env.CLOUDINARY_API_KEY) {
+        throw new Error("Cloudinary env vars missing");
+      }
+
+      // upload new image using buffer
+      const uploadFromBuffer = () =>
+        new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "dogeshbook/avatars" },
+            (error, result) => {
+              if (result) resolve(result);
+              else {
+                return reject(error)};
+            }
+          );
+
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+
+      const result = await uploadFromBuffer();
+
+      avatar = result.secure_url;
+      avatarPublicId = result.public_id;
+    }
+
     const dog = await Dog.create({
       name,
       breed,
       age,
       avatar,
+      avatarPublicId,
       owner: req.user._id,
     });
 

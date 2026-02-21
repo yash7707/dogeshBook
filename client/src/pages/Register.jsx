@@ -94,7 +94,7 @@ const Register = () => {
       {/* Left Side - Illustration */}
       <div className="register-illustration">
         <div className="illustration-content">
-          <div className="dog-characters">
+          <div className="dog-characters hide">
             <span className="dog-big">🐶</span>
             <span className="dog-medium">🎉</span>
             <span className="dog-small">🐕</span>

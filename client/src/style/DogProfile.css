@@ -49,31 +49,13 @@
   position: relative;
   overflow: visible;
   font-weight: 500;
+      overflow: hidden;
 }
 
 /*avatar*/
 #avtarDiv{
   max-width: 100px;
   margin: 0 auto;
-}
-/* Modern Modal Content Styling */
-.modal-inner {
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18), 0 1.5px 8px rgba(74, 111, 165, 0.10);
-  padding: 40px 32px 32px 32px;
-  min-width: 340px;
-  max-width: 95vw;
-  min-height: 220px;
-  text-align: center;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 22px;
-  animation: modalPop 0.25s cubic-bezier(.4,1.4,.6,1) both;
-  border: 1.5px solid #e2e8f0;
-  transition: box-shadow 0.2s, border 0.2s;
 }
 .modal-inner:hover, .modal-inner:focus-within {
   box-shadow: 0 12px 40px rgba(44, 62, 80, 0.22), 0 2px 12px rgba(74, 111, 165, 0.13);

@@ -1,4 +1,4 @@
-import "./config/bootstrap.js";
+import "./config/bootstrap.js"
 
 import express from "express";
 import cors from "cors";
@@ -19,11 +19,12 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173", // local frontend
   "http://localhost:3000", // optional
-  "https://dogesh-book.netlify.app", // production frontend
+  "https://peaceful-bombolone-a823c5.netlify.app", // production frontend
 ];
 
 // connect DB
 connectDB();
+
 
 // middleware
 app.use(
