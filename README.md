@@ -7,7 +7,7 @@ This project demonstrates real-world full-stack development concepts including a
 
 ## 🚀 Live Demo
 
-- **Frontend:** https://peaceful-bombolone-a823c5.netlify.app
+- **Frontend:** (https://dogesh-book.netlify.app/)
   
 ---
 
