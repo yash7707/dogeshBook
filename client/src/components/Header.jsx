@@ -1,79 +1,77 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import useAuth from "../context/useAuth";
 
 import "../style/Header.css";
-
 import logoGif from "../assets/logo-gif.gif";
 
 const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Refs for GSAP animations
   const headerRef = useRef(null);
   const logoRef = useRef(null);
+  const logoTextRef = useRef(null);
   const feedLinkRef = useRef(null);
   const dogLinkRef = useRef(null);
   const logoutBtnRef = useRef(null);
-  const loginLinkRef = useRef(null);
-  const registerLinkRef = useRef(null);
 
-  // GSAP animations on mount
+  // Mount animation
   useEffect(() => {
-    // Ensure refs are available
     if (!headerRef.current) return;
 
-    // Store the animation context
     const ctx = gsap.context(() => {
-      // Header slide in from top
+      // Header drops in with bounce
       gsap.from(headerRef.current, {
-        y: -100,
+        y: -80,
         opacity: 0,
-        duration: 0.8,
+        duration: 0.9,
+        ease: "back.out(1.4)",
+      });
+
+      // Logo icon pops in with spin
+      gsap.from(logoRef.current, {
+        scale: 0,
+        rotation: -15,
+        opacity: 0,
+        duration: 0.6,
+        delay: 0.3,
+        ease: "back.out(2)",
+      });
+
+      // Logo text slides in
+      gsap.from(logoTextRef.current, {
+        x: -20,
+        opacity: 0,
+        duration: 0.5,
+        delay: 0.45,
         ease: "power3.out",
       });
 
-      // Animate navigation items based on user state
       if (user) {
-        // For logged in user
         const navItems = [
           feedLinkRef.current,
           dogLinkRef.current,
           logoutBtnRef.current,
         ].filter(Boolean);
+
         gsap.from(navItems, {
-          x: 30,
+          y: -16,
           opacity: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          delay: 0.4,
-          ease: "power2.out",
+          duration: 0.5,
+          stagger: 0.08,
+          delay: 0.55,
+          ease: "back.out(1.6)",
         });
-      } else {
-        // For logged out user
-        // const navItems = [loginLinkRef.current, registerLinkRef.current].filter(
-        //   Boolean,
-        // );
-        // gsap.from(navItems, {
-        //   x: 30,
-        //   opacity: 0,
-        //   duration: 0.6,
-        //   stagger: 0.1,
-        //   delay: 0.4,
-        //   ease: "power2.out",
-        // });
       }
     });
 
-    // Cleanup
     return () => ctx.revert();
-  }, [user]); // Re-run when user changes
+  }, [user]);
 
-  // Original handleLogout function (unchanged)
   const handleLogout = () => {
-    // Add exit animation before logout
     gsap.to(headerRef.current, {
       opacity: 0,
       y: -50,
@@ -86,12 +84,10 @@ const Header = () => {
     });
   };
 
-  // Animation for nav item clicks
   const animateNavClick = (element) => {
     if (!element) return;
-
     gsap.to(element, {
-      scale: 0.95,
+      scale: 0.92,
       duration: 0.1,
       yoyo: true,
       repeat: 1,
@@ -99,253 +95,104 @@ const Header = () => {
     });
   };
 
-  // Animation for logo hover
   const animateLogoHover = (isHovering) => {
     if (!logoRef.current) return;
-
     gsap.to(logoRef.current, {
-      scale: isHovering ? 1.05 : 1,
-      duration: 0.2,
-      ease: "power2.out",
+      scale: isHovering ? 1.12 : 1,
+      rotation: isHovering ? 10 : 0,
+      duration: 0.3,
+      ease: "back.out(2)",
     });
   };
 
-  // Animation for button/link hover
-  const animateHover = (element, isHovering, colorType = "blue") => {
+  const animateLinkHover = (element, isHovering) => {
     if (!element) return;
-
-    const colors = {
-      blue: {
-        bg: "var(--primary-blue)",
-        bgHover: "var(--primary-blue-dark)",
-        text: "white",
-      },
-      coral: {
-        bg: "var(--secondary-coral)",
-        bgHover: "var(--secondary-coral-dark)",
-        text: "white",
-      },
-      outline: {
-        bg: "transparent",
-        bgHover: "var(--secondary-coral)",
-        text: "var(--secondary-coral)",
-        textHover: "white",
-      },
-    };
-
-    const color = colors[colorType];
-
     gsap.to(element, {
-      backgroundColor: isHovering ? color.bgHover : color.bg,
-      color: isHovering ? color.textHover || color.text : color.text,
-      scale: isHovering ? 1.05 : 1,
+      scale: isHovering ? 1.07 : 1,
       duration: 0.2,
-      ease: "power2.out",
+      ease: "back.out(2)",
     });
   };
 
-  // Animation for regular link hover
-  const animateLinkHover = (element, isHovering, color = "blue") => {
-    if (!element) return;
-
-    const bgColors = {
-      blue: "rgba(74, 111, 165, 0.1)",
-      coral: "rgba(255, 138, 122, 0.1)",
-    };
-
-    gsap.to(element, {
-      backgroundColor: isHovering ? bgColors[color] : "transparent",
-      scale: isHovering ? 1.05 : 1,
-      duration: 0.2,
-      ease: "power2.out",
-    });
-  };
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <header
-      ref={headerRef}
-      style={{
-        padding: "16px 32px",
-        backgroundColor: "var(--card-white, #FFFFFF)",
-        borderBottom: "1px solid var(--border-light, #E2E8F0)",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-      }}
-    >
-      {/* Logo */}
-      <div
-        ref={logoRef}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          cursor: "pointer",
-        }}
-        onClick={() => {
-          gsap.to(logoRef.current, {
-            scale: 1.1,
-            duration: 0.2,
-            yoyo: true,
-            repeat: 1,
-            ease: "power2.out",
-          });
-          navigate(user ? "/feed" : "/");
-        }}
-        onMouseEnter={() => animateLogoHover(true)}
-        onMouseLeave={() => animateLogoHover(false)}
-      >
-        {/* Custom Dog Icon */}
+    <header ref={headerRef} className="header">
+      <div className="header-inner">
+        {/* Logo */}
         <div
-          style={{
-            width: "36px",
-            height: "36px",
-            borderRadius: "12px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-          }}
+          className="header-logo"
+          onClick={() => navigate(user ? "/feed" : "/")}
+          onMouseEnter={() => animateLogoHover(true)}
+          onMouseLeave={() => animateLogoHover(false)}
         >
-          <img src={logoGif} id="logo" alt="logo-dog-gif" />
+          <div ref={logoRef} className="header-logo-icon">
+            <img src={logoGif} id="logo" alt="logo-dog-gif" />
+          </div>
+
+          <div ref={logoTextRef} className="header-logo-text">
+            <span className="logo-word-1">Dogesh</span>
+            <span className="logo-word-2">Book</span>
+          </div>
         </div>
 
-        <h3
-          style={{
-            color: "var(--primary-blue, #4A6FA5)",
-            margin: 0,
-            fontSize: "1.5rem",
-            fontWeight: 700,
-          }}
-        >
-          DogeshBook
-        </h3>
+        {/* Nav */}
+        <nav className="header-nav">
+          {user ? (
+            <>
+              <Link
+                ref={feedLinkRef}
+                to="/feed"
+                className={`header-nav-link ${isActive("/feed") || isActive("/") ? "is-active" : ""}`}
+                onClick={() => animateNavClick(feedLinkRef.current)}
+                onMouseEnter={() => animateLinkHover(feedLinkRef.current, true)}
+                onMouseLeave={() =>
+                  animateLinkHover(feedLinkRef.current, false)
+                }
+              >
+                <span className="nav-icon">🏠</span>
+                <span className="nav-label">Feed</span>
+                {(isActive("/feed") || isActive("/")) && (
+                  <span className="nav-active-dot" />
+                )}
+              </Link>
+
+              <Link
+                ref={dogLinkRef}
+                to="/dog"
+                className={`header-nav-link ${isActive("/dog") ? "is-active" : ""}`}
+                onClick={() => animateNavClick(dogLinkRef.current)}
+                onMouseEnter={() => animateLinkHover(dogLinkRef.current, true)}
+                onMouseLeave={() => animateLinkHover(dogLinkRef.current, false)}
+              >
+                <span className="nav-icon">🐶</span>
+                <span className="nav-label">My Dog</span>
+                {isActive("/dog") && <span className="nav-active-dot" />}
+              </Link>
+
+              <button
+                ref={logoutBtnRef}
+                onClick={() => {
+                  animateNavClick(logoutBtnRef.current);
+                  handleLogout();
+                }}
+                className="header-logout-btn"
+                onMouseEnter={(e) =>
+                  animateLinkHover(logoutBtnRef.current, true)
+                }
+                onMouseLeave={(e) =>
+                  animateLinkHover(logoutBtnRef.current, false)
+                }
+              >
+                <span>👋</span>
+                Logout
+              </button>
+            </>
+          ) : (
+            <></>
+          )}
+        </nav>
       </div>
-
-      <nav style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-        {user ? (
-          <>
-            <Link
-              ref={feedLinkRef}
-              to="/feed"
-              style={{
-                marginRight: "10px",
-                color: "var(--text-dark, #2D3748)",
-                textDecoration: "none",
-                fontWeight: 600,
-                padding: "8px 16px",
-                borderRadius: "12px",
-                backgroundColor: "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-              onClick={(e) => animateNavClick(e.target)}
-              onMouseEnter={(e) => animateLinkHover(e.target, true, "blue")}
-              onMouseLeave={(e) => animateLinkHover(e.target, false, "blue")}
-            >
-              Feed
-            </Link>
-
-            <Link
-              ref={dogLinkRef}
-              to="/dog"
-              style={{
-                marginRight: "10px",
-                color: "var(--text-dark, #2D3748)",
-                textDecoration: "none",
-                fontWeight: 600,
-                padding: "8px 16px",
-                borderRadius: "12px",
-                backgroundColor: "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-              onClick={(e) => animateNavClick(e.target)}
-              onMouseEnter={(e) => animateLinkHover(e.target, true, "coral")}
-              onMouseLeave={(e) => animateLinkHover(e.target, false, "coral")}
-            >
-              My Dog
-            </Link>
-
-            <button
-              ref={logoutBtnRef}
-              onClick={() => {
-                animateNavClick(logoutBtnRef.current);
-                handleLogout();
-              }}
-              style={{
-                padding: "8px 16px",
-                backgroundColor: "transparent",
-                border: "2px solid var(--secondary-coral, #FF8A7A)",
-                borderRadius: "12px",
-                color: "var(--secondary-coral, #FF8A7A)",
-                fontWeight: 600,
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-              onMouseEnter={() =>
-                animateHover(logoutBtnRef.current, true, "outline")
-              }
-              onMouseLeave={() =>
-                animateHover(logoutBtnRef.current, false, "outline")
-              }
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            {/* <Link
-              ref={loginLinkRef}
-              to="/login"
-              style={{
-                marginRight: "10px",
-                backgroundColor: "var(--primary-blue, #4A6FA5)",
-                color: "white",
-                textDecoration: "none",
-                fontWeight: 600,
-                padding: "8px 16px",
-                borderRadius: "12px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-              onClick={(e) => animateNavClick(e.target)}
-              onMouseEnter={(e) => animateHover(e.target, true, "blue")}
-              onMouseLeave={(e) => animateHover(e.target, false, "blue")}
-            >
-              Login
-            </Link>
-
-            <Link
-              ref={registerLinkRef}
-              to="/register"
-              style={{
-                backgroundColor: "var(--secondary-coral, #FF8A7A)",
-                color: "white",
-                textDecoration: "none",
-                fontWeight: 600,
-                padding: "8px 16px",
-                borderRadius: "12px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-              onClick={(e) => animateNavClick(e.target)}
-              onMouseEnter={(e) => animateHover(e.target, true, "coral")}
-              onMouseLeave={(e) => animateHover(e.target, false, "coral")}
-            >
-              Register
-            </Link> */}
-          </>
-        )}
-      </nav>
     </header>
   );
 };

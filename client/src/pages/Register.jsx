@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { gsap } from "gsap";
 import api from "../api/axios";
 import useAuth from "../context/useAuth";
-import "../style/Register.css";
+import "../style/Auth.css";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -11,361 +12,165 @@ const Register = () => {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [strength, setStrength] = useState(0);
 
   const navigate = useNavigate();
   const { login } = useAuth();
+  const cardRef = useRef(null);
+  const pawRefs = useRef([]);
+
+  useEffect(() => {
+    gsap.fromTo(cardRef.current,
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }
+    );
+    pawRefs.current.forEach((el, i) => {
+      if (!el) return;
+      gsap.to(el, {
+        y: `-=${10 + i * 3}`,
+        rotation: `+=${15 + i * 5}`,
+        duration: 3 + i * 0.7,
+        repeat: -1, yoyo: true,
+        ease: "sine.inOut",
+        delay: i * 0.4,
+      });
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    // Validation
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      return;
-    }
-
+    if (password !== confirmPassword) { setError("Passwords do not match"); return; }
+    if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
     setIsSubmitting(true);
-
     try {
-      const { data } = await api.post("/auth/register", {
-        email,
-        password,
-      });
-
-      // save token + user in context
+      const { data } = await api.post("/auth/register", { email, password });
       login(data);
-
-      // Show success animation before redirect
-      setTimeout(() => {
-        navigate("/dog");
-      }, 1500);
-
+      setTimeout(() => navigate("/dog"), 800);
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
+      setError(err.response?.data?.message || "Registration failed.");
       setIsSubmitting(false);
+      gsap.fromTo(cardRef.current,
+        { x: 0 },
+        { x: -8, duration: 0.07, yoyo: true, repeat: 5, ease: "power2.out" }
+      );
     }
   };
 
-  // Calculate password strength
-  const calculatePasswordStrength = (pass) => {
-    let strength = 0;
-    if (pass.length >= 6) strength += 1;
-    if (/[A-Z]/.test(pass)) strength += 1;
-    if (/[0-9]/.test(pass)) strength += 1;
-    if (/[^A-Za-z0-9]/.test(pass)) strength += 1;
-    setPasswordStrength(strength);
+  const onPasswordChange = (e) => {
+    const v = e.target.value;
+    setPassword(v);
+    let s = 0;
+    if (v.length >= 6) s++;
+    if (/[A-Z]/.test(v)) s++;
+    if (/[0-9]/.test(v)) s++;
+    if (/[^A-Za-z0-9]/.test(v)) s++;
+    setStrength(s);
   };
 
-  const handlePasswordChange = (e) => {
-    const value = e.target.value;
-    setPassword(value);
-    calculatePasswordStrength(value);
-  };
-
-  // Animated paws for decoration
-  const animatedPaws = ["🐾", "🐾", "🐾", "🐾", "🐾"];
+  const strengthColors = ["#e5e7eb", "#ef4444", "#f97316", "#eab308", "#22c55e"];
+  const strengthLabels = ["", "Weak", "Fair", "Good", "Strong"];
+  const match = confirmPassword && password === confirmPassword;
+  const mismatch = confirmPassword && password !== confirmPassword;
+  const canSubmit = email && password && confirmPassword && match && !isSubmitting;
 
   return (
-    <div className="register-container">
-      {/* Background Decorative Paws */}
-      <div className="background-paws">
-        {animatedPaws.map((paw, index) => (
-          <span 
-            key={index} 
-            className="paw"
-            style={{ 
-              animationDelay: `${index * 0.5}s`,
-              left: `${20 + index * 15}%`,
-              top: `${10 + index * 8}%`
-            }}
-          >
-            {paw}
+    <div className="auth-page">
+      <span ref={el => pawRefs.current[0] = el} className="auth-paw" style={{ left: "6%",  top: "10%" }}>🐾</span>
+      <span ref={el => pawRefs.current[1] = el} className="auth-paw" style={{ left: "88%", top: "7%"  }}>🐾</span>
+      <span ref={el => pawRefs.current[2] = el} className="auth-paw" style={{ left: "4%",  top: "72%" }}>🐾</span>
+      <span ref={el => pawRefs.current[3] = el} className="auth-paw" style={{ left: "91%", top: "68%" }}>🐾</span>
+      <span ref={el => pawRefs.current[4] = el} className="auth-paw" style={{ left: "78%", top: "85%" }}>🐾</span>
+      <span ref={el => pawRefs.current[5] = el} className="auth-paw" style={{ left: "20%", top: "88%" }}>🐾</span>
+
+      <div className="bg-blob bg-blob-1" />
+      <div className="bg-blob bg-blob-2" />
+      <div className="bg-blob bg-blob-3" />
+
+      <div ref={cardRef} className="auth-card auth-card-register">
+        <div className="auth-brand">
+          <div className="auth-brand-icon">🐕</div>
+          <span className="auth-brand-name">
+            <span>Dogesh</span><span className="brand-accent">Book</span>
           </span>
-        ))}
-      </div>
-
-      {/* Left Side - Illustration */}
-      <div className="register-illustration">
-        <div className="illustration-content">
-          <div className="dog-characters hide">
-            <span className="dog-big">🐶</span>
-            <span className="dog-medium">🎉</span>
-            <span className="dog-small">🐕</span>
-          </div>
-          <div className="illustration-text">
-            <h2 className="welcome-title">Join the Pack!</h2>
-            <p className="welcome-subtitle">
-              Create an account and let your dog make new furry friends!
-            </p>
-          </div>
-          <div className="illustration-features">
-            <div className="feature">
-              <span className="feature-icon">📝</span>
-              <span className="feature-text">Create dog profiles</span>
-            </div>
-            <div className="feature">
-              <span className="feature-icon">📷</span>
-              <span className="feature-text">Share photos & stories</span>
-            </div>
-            <div className="feature">
-              <span className="feature-icon">🤝</span>
-              <span className="feature-text">Connect with other dogs</span>
-            </div>
-          </div>
         </div>
-      </div>
 
-      {/* Right Side - Register Form */}
-      <div className="register-form-container">
-        <div className="form-card">
-          {/* Logo */}
-          <div className="form-logo">
-            <div className="logo-icon">
-              <span className="logo-dog">🐕</span>
-            </div>
-            <h1 className="logo-text">DogeshBook</h1>
+        <div className="auth-heading">
+          <h1 className="auth-title">Join the pack</h1>
+          <p className="auth-sub">Create an account and let your dog make new friends</p>
+        </div>
+
+        {error && <div className="auth-error">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="auth-field">
+            <label className="auth-label">Email</label>
+            <input
+              className="auth-input" type="email" placeholder="your@email.com"
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              required disabled={isSubmitting} autoComplete="email"
+            />
           </div>
 
-          {/* Form Header */}
-          <div className="form-header">
-            <h2 className="form-title">Create Your Account</h2>
-            <p className="form-subtitle">
-              Join our community of dog lovers and start sharing today!
-            </p>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="error-message">
-              <span className="error-icon">⚠️</span>
-              <div className="error-content">
-                <strong>Registration Failed</strong>
-                <p>{error}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Register Form */}
-          <form onSubmit={handleSubmit} className="register-form">
-            {/* Email Field */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">📧</span>
-                Email Address
-              </label>
-              <div className="input-container">
-                <input
-                  type="email"
-                  placeholder="your.email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  className="form-input"
-                  autoComplete="email"
-                />
-                <span className="input-icon">✉️</span>
-              </div>
-              <div className="input-hint">
-                We'll use this to send you doggy updates
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="form-group">
-              <div className="label-row">
-                <label className="form-label">
-                  <span className="label-icon">🔒</span>
-                  Password
-                </label>
-                <button
-                  type="button"
-                  className="show-password-btn"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? "🙈 Hide" : "👁️ Show"}
-                </button>
-              </div>
-              <div className="input-container">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Create a secure password"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  required
-                  disabled={isSubmitting}
-                  className="form-input"
-                  autoComplete="new-password"
-                />
-                <span className="input-icon">🔑</span>
-              </div>
-              
-              {/* Password Strength Meter */}
-              <div className="password-strength">
-                <div className="strength-label">
-                  Password Strength:
-                  <span className={`strength-text strength-${passwordStrength}`}>
-                    {passwordStrength === 0 ? " Weak" : 
-                     passwordStrength === 1 ? " Fair" : 
-                     passwordStrength === 2 ? " Good" : 
-                     passwordStrength === 3 ? " Strong" : " Very Strong"}
-                  </span>
-                </div>
-                <div className="strength-meter">
-                  {[1, 2, 3, 4].map((level) => (
-                    <div 
-                      key={level}
-                      className={`strength-bar ${passwordStrength >= level ? 'active' : ''}`}
-                      style={{ backgroundColor: passwordStrength >= level ? 
-                        ['#FF8A7A', '#FFB7C5', '#4A6FA5', '#68D391'][level - 1] : 
-                        'var(--border-light)' 
-                      }}
-                    />
-                  ))}
-                </div>
-                <div className="password-hint">
-                  <span className="hint-icon">💡</span>
-                  Use at least 6 characters with uppercase, numbers, and symbols for best security
-                </div>
-              </div>
-            </div>
-
-            {/* Confirm Password Field */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">✅</span>
-                Confirm Password
-              </label>
-              <div className="input-container">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Re-enter your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  className={`form-input ${confirmPassword && password !== confirmPassword ? 'error' : ''}`}
-                  autoComplete="new-password"
-                />
-                <span className="input-icon">🔒</span>
-                {confirmPassword && password === confirmPassword && (
-                  <span className="input-check">✅</span>
-                )}
-              </div>
-              {confirmPassword && password !== confirmPassword && (
-                <div className="password-mismatch">
-                  <span className="mismatch-icon">❌</span>
-                  Passwords do not match
-                </div>
-              )}
-            </div>
-
-            {/* Terms & Conditions */}
-            <div className="terms-group">
-              <label className="terms-label">
-                <input
-                  type="checkbox"
-                  required
-                  disabled={isSubmitting}
-                  className="terms-checkbox"
-                />
-                <span className="terms-text">
-                  I agree to the 
-                  <button type="button" className="terms-link">Doggy Terms of Service</button> and 
-                  <button type="button" className="terms-link">Bone Privacy Policy</button>
-                </span>
-              </label>
-            </div>
-
-            {/* Submit Button */}
-            <button 
-              type="submit" 
-              className={`submit-btn ${isSubmitting ? 'submitting' : ''}`}
-              disabled={isSubmitting || !email || !password || !confirmPassword || password !== confirmPassword}
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="loading-spinner"></span>
-                  Creating Account...
-                </>
-              ) : (
-                <>
-                  <span className="btn-icon">✨</span>
-                  Join DogeshBook
-                  <span className="btn-arrow">🐕→</span>
-                </>
-              )}
-            </button>
-
-            {/* Divider */}
-            <div className="form-divider">
-              <span className="divider-text">Already have an account?</span>
-            </div>
-
-            {/* Login Link */}
-            <div className="login-section">
-              <button 
-                type="button"
-                className="login-btn"
-                onClick={() => navigate("/login")}
-                disabled={isSubmitting}
-              >
-                <span className="login-icon">←</span>
-                Back to Login
+          <div className="auth-field">
+            <div className="field-row">
+              <label className="auth-label">Password</label>
+              <button type="button" className="toggle-pass" onClick={() => setShowPassword(p => !p)}>
+                {showPassword ? "Hide" : "Show"}
               </button>
             </div>
-          </form>
-
-          {/* Quick Tips */}
-          <div className="register-tips">
-            <div className="tip-item">
-              <span className="tip-icon">🐾</span>
-              <span className="tip-text">
-                After registration, you'll create your dog's profile!
-              </span>
-            </div>
-            <div className="tip-item">
-              <span className="tip-icon">🎯</span>
-              <span className="tip-text">
-                Use a valid email to receive important updates
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Success Animation */}
-        <div className={`success-overlay ${isSubmitting && !error ? 'visible' : ''}`}>
-          <div className="success-content">
-            <div className="success-dog">
-              <span className="dog-icon">🎉</span>
-              <div className="confetti">✨</div>
-            </div>
-            <h3>Welcome to the Pack!</h3>
-            <p>Creating your account...</p>
-            <div className="success-paws">
-              {animatedPaws.map((paw, index) => (
-                <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-                  {paw}
+            <input
+              className="auth-input" type={showPassword ? "text" : "password"}
+              placeholder="Create a password" value={password}
+              onChange={onPasswordChange} required disabled={isSubmitting}
+              autoComplete="new-password"
+            />
+            {password.length > 0 && (
+              <div className="strength-row">
+                <div className="strength-track">
+                  {[1,2,3,4].map(l => (
+                    <div key={l} className="strength-seg" style={{
+                      background: strength >= l ? strengthColors[strength] : "#e5e7eb"
+                    }} />
+                  ))}
+                </div>
+                <span className="strength-label" style={{ color: strengthColors[strength] }}>
+                  {strengthLabels[strength]}
                 </span>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
-        </div>
-      </div>
 
-      {/* Cute Corner Elements */}
-      <div className="corner-elements">
-        <div className="corner-paw top-left">🐾</div>
-        <div className="corner-paw top-right">🐾</div>
-        <div className="corner-paw bottom-left">🐾</div>
-        <div className="corner-paw bottom-right">🐾</div>
+          <div className="auth-field">
+            <label className="auth-label">Confirm Password</label>
+            <div className="input-suffix-wrap">
+              <input
+                className={`auth-input ${mismatch ? "input-err" : ""}`}
+                type={showPassword ? "text" : "password"} placeholder="Re-enter password"
+                value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                required disabled={isSubmitting}
+              />
+              {match && <span className="input-ok">✓</span>}
+            </div>
+            {mismatch && <p className="field-err">Passwords do not match</p>}
+          </div>
+
+          <label className="terms-row">
+            <input type="checkbox" required disabled={isSubmitting} className="terms-check" />
+            <span className="terms-text">
+              I agree to the <button type="button" className="inline-link">Terms</button> &amp; <button type="button" className="inline-link">Privacy Policy</button>
+            </span>
+          </label>
+
+          <button type="submit" disabled={!canSubmit} className={`auth-btn ${canSubmit ? "auth-btn-active" : ""}`}>
+            {isSubmitting ? <><span className="auth-spin" /> Creating account...</> : "Create Account"}
+          </button>
+        </form>
+
+        <div className="auth-divider"><span>Already have an account?</span></div>
+        <button className="auth-alt-btn" onClick={() => navigate("/login")} disabled={isSubmitting}>
+          Sign in instead
+        </button>
       </div>
     </div>
   );

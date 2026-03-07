@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import { getAvatarColor, getAvatarLetter } from "../utils/getAvatarPlaceholder";
 import "../style/PostCard.css";
 
@@ -7,173 +8,115 @@ const PostCard = ({ post, onLike }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
-  // Initialize state from post data
-  useEffect(() => {
-    const liked =
-      post.likedByUser ||
-      (post.likes && Array.isArray(post.likes) && post.likes.length > 0);
-    setIsLiked(liked);
+  const cardRef = useRef(null);
+  const likeBtnRef = useRef(null);
+  const heartRef = useRef(null);
 
-    const count = post.likes?.length || post.likesCount || 0;
-    setLikeCount(count);
+  useEffect(() => {
+    const liked = post.likedByUser || (post.likes && Array.isArray(post.likes) && post.likes.length > 0);
+    setIsLiked(liked);
+    setLikeCount(post.likes?.length || post.likesCount || 0);
   }, [post]);
 
   const handleLikeClick = () => {
-    // Trigger animation
     setIsAnimating(true);
-
-    // Update local state immediately for better UX
-    const newLikedState = !isLiked;
-    setIsLiked(newLikedState);
-    setLikeCount((prev) => (newLikedState ? prev + 1 : prev - 1));
-
-    // Call the parent handler
+    const next = !isLiked;
+    setIsLiked(next);
+    setLikeCount((p) => (next ? p + 1 : p - 1));
     onLike();
 
-    // Reset animation after a delay
+    if (heartRef.current) {
+      gsap.timeline()
+        .to(heartRef.current, { scale: 1.7, duration: 0.12, ease: "back.out(3)" })
+        .to(heartRef.current, { scale: 1, duration: 0.22, ease: "elastic.out(1.2, 0.4)" });
+    }
+    if (likeBtnRef.current) {
+      gsap.fromTo(likeBtnRef.current, { scale: 1 }, { scale: 0.93, duration: 0.1, yoyo: true, repeat: 1 });
+    }
     setTimeout(() => setIsAnimating(false), 600);
   };
 
-  // Format timestamp if available
-  const formatTime = (timestamp) => {
-    if (!timestamp) return "";
-
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInHours = (now - date) / (1000 * 60 * 60);
-
-    if (diffInHours < 1) {
-      const mins = Math.floor(diffInHours * 60);
-      return `${mins}m ago`;
-    } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`;
-    } else {
-      return date.toLocaleDateString();
-    }
+  const formatTime = (ts) => {
+    if (!ts) return "";
+    const d = new Date(ts), now = new Date();
+    const h = (now - d) / 3600000;
+    if (h < 1) return `${Math.floor(h * 60)}m ago`;
+    if (h < 24) return `${Math.floor(h)}h ago`;
+    return d.toLocaleDateString();
   };
 
   return (
-    <div className="post-card">
-      {/* Post Header */}
-      <div className="post-header">
-        <div
-          className="dog-avatar"
-          style={{
-            backgroundColor: getAvatarColor(post.dog?.name),
-          }}
-        >
-          {getAvatarLetter(post.dog?.name)}
+    <div ref={cardRef} className="post-card">
+
+      {/* Left accent stripe */}
+      <div className="post-stripe" style={{ background: getAvatarColor(post.dog?.name) }} />
+
+      <div className="post-inner">
+        {/* Header */}
+        <div className="post-header">
+          <div className="dog-avatar" style={{ backgroundColor: getAvatarColor(post.dog?.name) }}>
+            {getAvatarLetter(post.dog?.name)}
+          </div>
+          <div className="dog-info">
+            <div className="dog-name-row">
+              <span className="dog-name">{post.dog?.name || "Anonymous Dog"}</span>
+              {post.dog?.breed && <span className="breed-badge">{post.dog.breed}</span>}
+            </div>
+            <div className="post-meta">
+              {post.createdAt && <span className="post-time">{formatTime(post.createdAt)}</span>}
+              <span className="post-status"><span className="status-dot" />Posted</span>
+            </div>
+          </div>
+          <button className="more-btn">⋮</button>
         </div>
 
-        <div className="dog-info">
-          <div className="dog-name-wrapper">
-            <h3 className="dog-name">{post.dog?.name || "Anonymous Dog"}</h3>
-            {post.dog?.breed && (
-              <span className="dog-breed">{post.dog.breed}</span>
-            )}
-          </div>
+        {/* Content */}
+        <p className="post-content">{post.content}</p>
 
-          <div className="post-meta">
-            {post.createdAt && (
-              <span className="post-time">
-                <span className="time-icon">🕐</span>
-                {formatTime(post.createdAt)}
-              </span>
-            )}
-            <span className="post-indicator">
-              <span className="indicator-dot"></span>
-              Posted
-            </span>
+        {post.images?.length > 0 && (
+          <div className="image-grid">
+            {post.images.slice(0, 4).map((img, i) => (
+              <div key={i} className="image-preview" style={{ backgroundImage: `url(${img})` }}>
+                {i === 3 && post.images.length > 4 && <div className="image-more">+{post.images.length - 4}</div>}
+              </div>
+            ))}
           </div>
+        )}
+
+        {/* Stats row */}
+        <div className="post-stats">
+          <span className="stat"><strong>{likeCount}</strong> Wags</span>
+          <span className="stat-dot" />
+          <span className="stat"><strong>{post.comments?.length || 0}</strong> Woofs</span>
+          <span className="stat-dot" />
+          <span className="stat"><strong>{post.shares || 0}</strong> Sniffs</span>
         </div>
 
+        {/* Actions */}
         <div className="post-actions">
-          <button className="action-btn more-btn" aria-label="More options">
-            ⋮
+          <button
+            ref={likeBtnRef}
+            className={`act-btn act-like ${isLiked ? "liked" : ""} ${isAnimating ? "animating" : ""}`}
+            onClick={handleLikeClick}
+          >
+            <span ref={heartRef}>{isLiked ? "❤️" : "🤍"}</span>
+            {isLiked ? "Liked" : "Wag"}
+          </button>
+          <button className="act-btn act-comment">
+            <span>💬</span> Woof
+          </button>
+          <button className="act-btn act-share">
+            <span>🔁</span> Sniff
           </button>
         </div>
-      </div>
 
-      {/* Post Content */}
-      <div className="post-content">
-        <p>{post.content}</p>
-
-        {/* If there are images (you can expand this later) */}
-        {post.images && post.images.length > 0 && (
-          <div className="post-images">
-            <div className="image-grid">
-              {post.images.slice(0, 4).map((img, index) => (
-                <div
-                  key={index}
-                  className="image-preview"
-                  style={{ backgroundImage: `url(${img})` }}
-                >
-                  {index === 3 && post.images.length > 4 && (
-                    <div className="image-count">+{post.images.length - 4}</div>
-                  )}
-                </div>
-              ))}
-            </div>
+        {/* Tags */}
+        {post.tags?.length > 0 && (
+          <div className="post-tags">
+            {post.tags.map((t, i) => <span key={i} className="tag">#{t}</span>)}
           </div>
         )}
       </div>
-
-      {/* Post Stats */}
-      <div className="post-stats">
-        <div className="stat">
-          <span className="stat-icon">❤️</span>
-          <span className="stat-count">{likeCount}</span>
-          <span className="stat-label">Wags</span>
-        </div>
-
-        <div className="stat">
-          <span className="stat-icon">💬</span>
-          <span className="stat-count">{post.comments?.length || 0}</span>
-          <span className="stat-label">Woofs</span>
-        </div>
-
-        <div className="stat">
-          <span className="stat-icon">🔁</span>
-          <span className="stat-count">{post.shares || 0}</span>
-          <span className="stat-label">Sniffs</span>
-        </div>
-      </div>
-
-      {/* Post Actions */}
-      <div className="post-actions-bar">
-        <button
-          className={`action-btn like-btn ${isLiked ? "liked" : ""} ${isAnimating ? "animating" : ""}`}
-          onClick={handleLikeClick}
-          aria-label={isLiked ? "Unlike" : "Like"}
-        >
-          <div className="like-icon-container">
-            <span className="like-icon-heart">❤️</span>
-            <span className="like-icon-paw">🐾</span>
-          </div>
-          <span className="action-label">{isLiked ? "Liked" : "Wag"}</span>
-        </button>
-
-        <button className="action-btn comment-btn" aria-label="Comment">
-          <span className="action-icon">💬</span>
-          <span className="action-label">Woof</span>
-        </button>
-
-        <button className="action-btn share-btn" aria-label="Share">
-          <span className="action-icon">🔁</span>
-          <span className="action-label">Sniff</span>
-        </button>
-      </div>
-
-      {/* Tags if any */}
-      {post.tags && post.tags.length > 0 && (
-        <div className="post-tags">
-          {post.tags.map((tag, index) => (
-            <span key={index} className="tag">
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   );
 };

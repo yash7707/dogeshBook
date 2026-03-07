@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { gsap } from "gsap";
 import api from "../api/axios";
 import useAuth from "../context/useAuth";
-import "../style/Login.css"; 
+import "../style/Auth.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,280 +14,125 @@ const Login = () => {
 
   const navigate = useNavigate();
   const { login } = useAuth();
+  const cardRef = useRef(null);
+  const pawRefs = useRef([]);
+
+  useEffect(() => {
+    // Card entrance — start visible, just slide up
+    gsap.fromTo(cardRef.current,
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }
+    );
+
+    // Float each paw independently
+    pawRefs.current.forEach((el, i) => {
+      if (!el) return;
+      gsap.to(el, {
+        y: `-=${10 + i * 3}`,
+        rotation: `+=${15 + i * 5}`,
+        duration: 3 + i * 0.7,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: i * 0.4,
+      });
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
-
     try {
-      const { data } = await api.post("/auth/login", {
-        email,
-        password,
-      });
-
-      // save token + user in context
+      const { data } = await api.post("/auth/login", { email, password });
       login(data);
-
-      // Show success animation before redirect
-      setTimeout(() => {
-        navigate("/feed");
-      }, 1000);
-
+      setTimeout(() => navigate("/feed"), 800);
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please check your credentials.");
       setIsSubmitting(false);
+      gsap.fromTo(cardRef.current,
+        { x: 0 },
+        { x: -8, duration: 0.07, yoyo: true, repeat: 5, ease: "power2.out" }
+      );
     }
   };
 
-  const redirectRegister = () => {
-    navigate("/register");
-  };
-
-  // Animated paws for decoration
-  const animatedPaws = ["🐾", "🐾", "🐾", "🐾", "🐾"];
-
   return (
-    <div className="login-container">
-      {/* Background Decorative Paws */}
-      <div className="background-paws">
-        {animatedPaws.map((paw, index) => (
-          <span 
-            key={index} 
-            className="paw"
-            style={{ 
-              animationDelay: `${index * 0.5}s`,
-              left: `${20 + index * 15}%`,
-              top: `${10 + index * 8}%`
-            }}
-          >
-            {paw}
+    <div className="auth-page">
+      {/* Floating paws — CSS animated, no GSAP opacity issues */}
+      <span ref={el => pawRefs.current[0] = el} className="auth-paw" style={{ left: "6%",  top: "10%" }}>🐾</span>
+      <span ref={el => pawRefs.current[1] = el} className="auth-paw" style={{ left: "88%", top: "7%"  }}>🐾</span>
+      <span ref={el => pawRefs.current[2] = el} className="auth-paw" style={{ left: "4%",  top: "72%" }}>🐾</span>
+      <span ref={el => pawRefs.current[3] = el} className="auth-paw" style={{ left: "91%", top: "68%" }}>🐾</span>
+      <span ref={el => pawRefs.current[4] = el} className="auth-paw" style={{ left: "78%", top: "85%" }}>🐾</span>
+      <span ref={el => pawRefs.current[5] = el} className="auth-paw" style={{ left: "20%", top: "88%" }}>🐾</span>
+
+      <div className="bg-blob bg-blob-1" />
+      <div className="bg-blob bg-blob-2" />
+      <div className="bg-blob bg-blob-3" />
+
+      <div ref={cardRef} className="auth-card">
+        <div className="auth-brand">
+          <div className="auth-brand-icon">🐶</div>
+          <span className="auth-brand-name">
+            <span>Dogesh</span><span className="brand-accent">Book</span>
           </span>
-        ))}
-      </div>
-
-      {/* Left Side - Illustration */}
-      <div className="login-illustration">
-        <div className="illustration-content">
-          <div className="dog-characters hide">
-            <span className="dog-big">🐕</span>
-            <span className="dog-medium">🐩</span>
-            <span className="dog-small">🐕‍🦺</span>
-          </div>
-          <div className="illustration-text">
-            <h2 className="welcome-title">Welcome Back!</h2>
-            <p className="welcome-subtitle">
-              Your furry friends missed you! Sign in to see what they've been up to.
-            </p>
-          </div>
-          <div className="illustration-features">
-            <div className="feature">
-              <span className="feature-icon">📰</span>
-              <span className="feature-text">See doggy updates</span>
-            </div>
-            <div className="feature">
-              <span className="feature-icon">❤️</span>
-              <span className="feature-text">Wag at cute posts</span>
-            </div>
-            <div className="feature">
-              <span className="feature-icon">🐾</span>
-              <span className="feature-text">Share your adventures</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side - Login Form */}
-      <div className="login-form-container">
-        <div className="form-card">
-          {/* Logo */}
-          <div className="form-logo">
-            <div className="logo-icon">
-              <span className="logo-dog">🐶</span>
-            </div>
-            <h1 className="logo-text">DogeshBook</h1>
-          </div>
-
-          {/* Form Header */}
-          <div className="form-header">
-            <h2 className="form-title">Sign In to Your Account</h2>
-            <p className="form-subtitle">
-              Enter your credentials to access your dog's social network
-            </p>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="error-message">
-              <span className="error-icon">⚠️</span>
-              <div className="error-content">
-                <strong>Login Failed</strong>
-                <p>{error}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Login Form */}
-          <form onSubmit={handleSubmit} className="login-form">
-            {/* Email Field */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">📧</span>
-                Email Address
-              </label>
-              <div className="input-container">
-                <input
-                  type="email"
-                  placeholder="your.email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  className="form-input"
-                  autoComplete="email"
-                />
-                <span className="input-icon">✉️</span>
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="form-group">
-              <div className="label-row">
-                <label className="form-label">
-                  <span className="label-icon">🔒</span>
-                  Password
-                </label>
-                <button
-                  type="button"
-                  className="show-password-btn"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? "🙈 Hide" : "👁️ Show"}
-                </button>
-              </div>
-              <div className="input-container">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  className="form-input"
-                  autoComplete="current-password"
-                />
-                <span className="input-icon">🔑</span>
-              </div>
-              <div className="password-hint">
-                <span className="hint-icon">💡</span>
-                Must be at least 6 characters long
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <button 
-              type="submit" 
-              className={`submit-btn ${isSubmitting ? 'submitting' : ''}`}
-              disabled={isSubmitting || !email || !password}
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="loading-spinner"></span>
-                  Signing In...
-                </>
-              ) : (
-                <>
-                  <span className="btn-icon">🐾</span>
-                  Sign In to DogeshBook
-                  <span className="btn-arrow">→</span>
-                </>
-              )}
-            </button>
-
-            {/* Divider */}
-            <div className="form-divider  hide">
-              <span className="divider-text">or continue with</span>
-            </div>
-
-            {/* Alternative Login Options */}
-            <div className="social-login hide">
-              <button 
-                type="button"
-                className="social-btn google-btn"
-                disabled={isSubmitting}
-              >
-                <span className="social-icon">🐕</span>
-                Demo Login
-              </button>
-              <button 
-                type="button"
-                className="social-btn demo-btn"
-                onClick={() => {
-                  setEmail("demo@example.com");
-                  setPassword("demo123");
-                }}
-                disabled={isSubmitting}
-              >
-                <span className="social-icon">🎮</span>
-                Quick Demo
-              </button>
-            </div>
-          </form>
-
-          {/* Register Link */}
-          <div className="register-section">
-            <p className="register-text">
-              New to DogeshBook? 
-              <button 
-                onClick={redirectRegister}
-                className="register-link"
-                disabled={isSubmitting}
-              >
-                Create an account
-                <span className="link-arrow">🐕→</span>
-              </button>
-            </p>
-          </div>
-
-          {/* Footer Note */}
-          <div className="form-footer hide">
-            <div className="footer-note">
-              <span className="note-icon">🐕‍🦺</span>
-              <p>
-                By signing in, you agree to our 
-                <button className="footer-link">Doggy Terms</button> and 
-                <button className="footer-link">Bone Policy</button>
-              </p>
-            </div>
-          </div>
         </div>
 
-        {/* Success Animation */}
-        <div className={`success-overlay ${isSubmitting && !error ? 'visible' : ''}`}>
-          <div className="success-content">
-            <div className="success-dog">
-              <span className="dog-icon">🐶</span>
-              <div className="tail-wag"></div>
-            </div>
-            <h3>Welcome Back!</h3>
-            <p>Taking you to your feed...</p>
-            <div className="success-paws">
-              {animatedPaws.map((paw, index) => (
-                <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-                  {paw}
-                </span>
-              ))}
-            </div>
-          </div>
+        <div className="auth-heading">
+          <h1 className="auth-title">Welcome back</h1>
+          <p className="auth-sub">Sign in to see what your pack is up to</p>
         </div>
-      </div>
 
-      {/* Cute Corner Elements */}
-      <div className="corner-elements">
-        <div className="corner-paw top-left">🐾</div>
-        <div className="corner-paw top-right">🐾</div>
-        <div className="corner-paw bottom-left">🐾</div>
-        <div className="corner-paw bottom-right">🐾</div>
+        {error && <div className="auth-error">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="auth-field">
+            <label className="auth-label">Email</label>
+            <input
+              className="auth-input"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isSubmitting}
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="auth-field">
+            <div className="field-row">
+              <label className="auth-label">Password</label>
+              <button type="button" className="toggle-pass" onClick={() => setShowPassword(p => !p)}>
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+            <input
+              className="auth-input"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isSubmitting}
+              autoComplete="current-password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting || !email || !password}
+            className={`auth-btn ${email && password && !isSubmitting ? "auth-btn-active" : ""}`}
+          >
+            {isSubmitting ? <><span className="auth-spin" /> Signing in...</> : "Sign In"}
+          </button>
+        </form>
+
+        <div className="auth-divider"><span>New to DogeshBook?</span></div>
+        <button className="auth-alt-btn" onClick={() => navigate("/register")} disabled={isSubmitting}>
+          Create an account
+        </button>
       </div>
     </div>
   );

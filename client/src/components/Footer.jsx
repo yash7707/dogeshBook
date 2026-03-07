@@ -5,8 +5,8 @@ const Footer = () => {
   const [bouncingPaw, setBouncingPaw] = useState(false);
   const [tailWag, setTailWag] = useState(false);
   const [funFactIndex, setFunFactIndex] = useState(0);
+  const [factVisible, setFactVisible] = useState(true);
 
-  // Dog fun facts
   const dogFacts = [
     "Dogs' noses are as unique as human fingerprints!",
     "A dog's sense of smell is 10,000 times stronger than ours!",
@@ -18,18 +18,22 @@ const Footer = () => {
     "Yawning is contagious between dogs and humans!",
   ];
 
-  // Cycle through fun facts
+  // Cycle through fun facts with fade
   useEffect(() => {
     const interval = setInterval(() => {
-      setFunFactIndex((prev) => (prev + 1) % dogFacts.length);
-      setTailWag(true);
-      setTimeout(() => setTailWag(false), 1000);
-    }, 8000); // Change fact every 8 seconds
+      setFactVisible(false);
+      setTimeout(() => {
+        setFunFactIndex((prev) => (prev + 1) % dogFacts.length);
+        setFactVisible(true);
+        setTailWag(true);
+        setTimeout(() => setTailWag(false), 1000);
+      }, 400);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, [dogFacts.length]);
 
-  // Trigger paw bounce randomly
+  // Random paw bounce
   useEffect(() => {
     const randomBounce = () => {
       if (Math.random() > 0.7) {
@@ -37,47 +41,44 @@ const Footer = () => {
         setTimeout(() => setBouncingPaw(false), 300);
       }
     };
-
     const interval = setInterval(randomBounce, 3000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <footer className="footer">
-      {/* Fun fact section */}
-      <div className="fun-fact-section">
-        <div className={`tail ${tailWag ? "wagging" : ""}`}>🐕</div>
-        <p className="fun-fact">
-          <span className="fact-icon">💡</span>
-          {dogFacts[funFactIndex]}
-        </p>
-      </div>
 
-      {/* Animated paws */}
-      <div className="paw-trail">
-        {[...Array(5)].map((_, i) => (
-          <span
-            key={i}
-            className={`paw ${bouncingPaw ? "bounce" : ""}`}
-            style={{ animationDelay: `${i * 0.1}s` }}
-          >
-            🐾
-          </span>
-        ))}
-      </div>
+     
 
-      {/* Main content */}
-      <div className="footer-content">
-        <div className="footer-message">
-          <span className="heart-beat">💖</span>
-          <span> Made with </span>
-          <span className="treat-icon" title="Treats!">
-            🍖
-          </span>
-          <span> for dog lovers everywhere </span>
-          <span className="heart-beat">💖</span>
+      <div className="footer-body">
+
+        {/* Fun fact pill */}
+        <div className="fun-fact-pill">
+          <span className={`tail-dog ${tailWag ? "wagging" : ""}`}>🐕</span>
+          <p className={`fun-fact-text ${factVisible ? "visible" : "hidden"}`}>
+            {dogFacts[funFactIndex]}
+          </p>
         </div>
 
+        {/* Paw trail — subtle, text based */}
+        <div className="paw-trail">
+          {[...Array(5)].map((_, i) => (
+            <span
+              key={i}
+              className={`paw-dot ${bouncingPaw ? "bounce" : ""}`}
+              style={{ animationDelay: `${i * 0.15}s` }}
+            />
+          ))}
+        </div>
+
+        {/* Brand + tagline */}
+        <div className="footer-brand">
+          <span className="footer-logo-word1">Dogesh</span>
+          <span className="footer-logo-word2">Book</span>
+          <p className="footer-tagline">Where every dog has its day</p>
+        </div>
+
+        {/* Links */}
         <div className="footer-links">
           <button
             className="footer-link"
@@ -89,14 +90,11 @@ const Footer = () => {
           >
             Breed Guide
           </button>
-          <span className="divider">•</span>
+          <span className="footer-divider" />
           <button
             className="footer-link"
             onClick={() => {
-              window.open(
-                "https://www.aspca.org/animal-homelessness",
-                "_blank",
-              );
+              window.open("https://www.aspca.org/animal-homelessness", "_blank");
               setBouncingPaw(true);
               setTimeout(() => setBouncingPaw(false), 300);
             }}
@@ -106,29 +104,24 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="copyright">
-          <span>
-            {" "}
-            © {new Date().getFullYear()} DogeshBook - Where every dog has its
-            day!{" "}
-          </span>
+        <div className="footer-copyright">
+          © {new Date().getFullYear()} DogeshBook — Made with love for dog lovers everywhere
         </div>
 
-        {/* Tiny hidden joke */}
+        {/* Hidden joke */}
         <div className="hidden-joke hide">
           <small
             title="Click for a surprise!"
             onClick={() => {
-              alert(
-                "Why don't dogs make good dancers?\n\nBecause they have two left feet! 🐾🕺",
-              );
+              alert("Why don't dogs make good dancers?\n\nBecause they have two left feet! 🐾🕺");
               setBouncingPaw(true);
               setTimeout(() => setBouncingPaw(false), 500);
             }}
           >
-            psst... click here for a dog joke! 🤫
+            psst... click here for a dog joke!
           </small>
         </div>
+
       </div>
     </footer>
   );
